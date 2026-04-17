@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+    <h2>Login</h2>
+
+    <input type="text" id="usuario" placeholder="Usuario">
+    <input type="password" id="clave" placeholder="Clave">
+
+    <button onclick="login()">Ingresar</button>
+</div>
+
+<script>
+function login() {
+    fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            usuario: document.getElementById('usuario').value,
+            clave: document.getElementById('clave').value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.mensaje);
+        if (data.mensaje === "Login correcto") {
+            window.location.href = "tipopersona.html";
+        }
+    });
+}
+</script>
