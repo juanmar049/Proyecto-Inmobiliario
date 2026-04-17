@@ -1,0 +1,214 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+    <h2>👤 Gestión de Personas</h2>
+
+    <div class="formulario">
+        <!-- COMBO AUTOMÁTICO -->
+        <select id="idTipoPersona"></select>
+
+        <input id="nombre" placeholder="Nombre">
+        <input id="apellido" placeholder="Apellido">
+        <input id="fechaNacimiento" type="date">
+        <input id="domicilio" placeholder="Domicilio">
+        <input id="telefono" placeholder="Teléfono">
+        <input id="correo" placeholder="Correo">
+
+        <button onclick="guardar()" id="btnGuardar">Guardar</button>
+    </div>
+
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Domicilio</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaPersonas"></tbody>
+    </table>
+</div>
+
+<script>
+let editando = false;
+let idEditar = null;
+
+// 🔽 COMBO AUTOMÁTICO DESDE BD
+function cargarTipos() {
+    fetch('http://localhost:3000/tipopersona')
+    .then(res => res.json())
+    .then(data => {
+        console.log("TIPOS:", data); // 👈 DEBUG
+
+        let select = document.getElementById('idTipoPersona');
+
+        // 🔥 LIMPIAR BIEN
+        select.innerHTML = '';
+
+        // 🔥 OPCIÓN INICIAL
+        let option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Seleccione Tipo";
+        select.appendChild(option);
+
+        // 🔥 CARGAR DATOS
+        data.forEach(tp => {
+            let opt = document.createElement("option");
+            opt.value = tp.idTipoPersona;
+            opt.textContent = tp.descripcion + " (" + tp.tipoEntidad + ")";
+            select.appendChild(opt);
+        });
+    })
+    .catch(err => console.error("ERROR:", err));
+}
+
+// 🔽 CARGAR PERSONAS
+function cargar() {
+    fetch('http://localhost:3000/persona')
+    .then(res => res.json())
+    .then(data => {
+        let tabla = document.getElementById('tablaPersonas');
+        tabla.innerHTML = '';
+
+        data.forEach(p => {
+            tabla.innerHTML += `
+                <tr>
+                    <td>${p.nombre} ${p.apellido}</td>
+                    <td>${p.tipo}</td>
+                    <td>${p.fechaNacimiento || ''}</td>
+                    <td>${p.domicilio || ''}</td>
+                    <td>${p.telefono || ''}</td>
+                    <td>${p.correo || ''}</td>
+                    <td>
+                        <button onclick="editar(${p.idPersona})">✏️</button>
+                        <button onclick="eliminar(${p.idPersona})">X</button>
+                    </td>
+                </tr>
+            `;
+        });
+    });
+}
+
+// 🔽 VALIDACIÓN VISUAL
+function validar() {
+    let campos = [
+        'idTipoPersona',
+        'nombre',
+        'apellido',
+        'fechaNacimiento',
+        'domicilio',
+        'telefono',
+        'correo'
+    ];
+
+    let valido = true;
+
+    campos.forEach(id => {
+        let c = document.getElementById(id);
+        c.style.border = '1px solid #ccc';
+
+        if (c.value.trim() === '') {
+            c.style.border = '2px solid red';
+            valido = false;
+        }
+    });
+
+    return valido;
+}
+
+// 🔽 GUARDAR / ACTUALIZAR
+function guardar() {
+    if (!validar()) {
+        alert("Complete todos los campos");
+        return;
+    }
+
+    let datos = {
+        idTipoPersona: document.getElementById('idTipoPersona').value,
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        fechaNacimiento: document.getElementById('fechaNacimiento').value,
+        domicilio: document.getElementById('domicilio').value,
+        telefono: document.getElementById('telefono').value,
+        correo: document.getElementById('correo').value
+    };
+
+    if (editando) {
+        fetch('http://localhost:3000/persona/' + idEditar, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        }).then(() => {
+            resetForm();
+            cargar();
+        });
+    } else {
+        fetch('http://localhost:3000/persona', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        }).then(() => {
+            limpiar();
+            cargar();
+        });
+    }
+}
+
+// 🔽 EDITAR
+function editar(id) {
+    fetch('http://localhost:3000/persona')
+    .then(res => res.json())
+    .then(data => {
+        let p = data.find(x => x.idPersona == id);
+
+        editando = true;
+        idEditar = id;
+
+        document.getElementById('nombre').value = p.nombre;
+        document.getElementById('apellido').value = p.apellido;
+        document.getElementById('fechaNacimiento').value = p.fechaNacimiento;
+        document.getElementById('domicilio').value = p.domicilio;
+        document.getElementById('telefono').value = p.telefono;
+        document.getElementById('correo').value = p.correo;
+        document.getElementById('idTipoPersona').value = p.idTipoPersona;
+
+        document.getElementById('btnGuardar').textContent = "Actualizar";
+    });
+}
+
+// 🔽 ELIMINAR
+function eliminar(id) {
+    if (!confirm("¿Eliminar esta persona?")) return;
+
+    fetch('http://localhost:3000/persona/' + id, {
+        method: 'DELETE'
+    }).then(() => cargar());
+}
+
+// 🔽 LIMPIAR
+function limpiar() {
+    document.getElementById('idTipoPersona').value = '';
+    document.getElementById('nombre').value = '';
+    document.getElementById('apellido').value = '';
+    document.getElementById('fechaNacimiento').value = '';
+    document.getElementById('domicilio').value = '';
+    document.getElementById('telefono').value = '';
+    document.getElementById('correo').value = '';
+}
+
+// 🔽 RESET
+function resetForm() {
+    limpiar();
+    editando = false;
+    idEditar = null;
+    document.getElementById('btnGuardar').textContent = "Guardar";
+}
+
+// 🚀 INICIO
+cargar();
+cargarTipos();
+</script>
