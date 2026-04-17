@@ -1,0 +1,55 @@
+body {
+    font-family: Arial;
+    background: #2c4a7a;
+}
+
+.container {
+    width: 90%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.formulario {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input, select {
+    padding: 10px;
+}
+
+button {
+    padding: 10px;
+    background: #3d6cb9;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla th, .tabla td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.tabla th {
+    background: #3d6cb9;
+    color: white;
+}
+
+.btn-editar {
+    background: orange;
+}
+
+.btn-eliminar {
+    background: red;
+}
