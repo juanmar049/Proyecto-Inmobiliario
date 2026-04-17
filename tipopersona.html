@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+    <h2>Tipo Persona</h2>
+
+    <input id="descripcion" placeholder="Descripción">
+
+    <!-- CORREGIDO -->
+    <select id="tipoEntidad">
+        <option value="">Seleccione Tipo</option>
+        <option value="Interno">Interno</option>
+        <option value="Externo">Externo</option>
+    </select>
+
+    <button onclick="crear()">Guardar</button>
+
+    <ul id="lista"></ul>
+</div>
+
+<script>
+
+// 🔽 Cargar datos
+function cargar() {
+    fetch('http://localhost:3000/tipopersona')
+    .then(res => res.json())
+    .then(data => {
+        let lista = document.getElementById('lista');
+        lista.innerHTML = '';
+
+        data.forEach(tp => {
+            lista.innerHTML += `
+                <li>
+                    ${tp.descripcion} - ${tp.tipoEntidad}
+                    <button onclick="eliminar(${tp.idTipoPersona})">X</button>
+                </li>
+            `;
+        });
+    })
+    .catch(err => console.error("Error al cargar:", err));
+}
+
+// 🔽 Crear
+function crear() {
+    let descripcion = document.getElementById('descripcion').value.trim();
+    let tipoEntidad = document.getElementById('tipoEntidad').value;
+
+    if (descripcion === '' || tipoEntidad === '') {
+        alert("Complete todos los campos");
+        return;
+    }
+
+    fetch('http://localhost:3000/tipopersona', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            descripcion: descripcion,
+            tipoEntidad: tipoEntidad
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Respuesta:", data); // 👈 IMPORTANTE
+        cargar();
+        limpiar();
+    })
+    .catch(err => console.error("Error al guardar:", err));
+}
+
+// 🔽 Eliminar
+function eliminar(id) {
+    if (!confirm("¿Eliminar este registro?")) return;
+
+    fetch('http://localhost:3000/tipopersona/' + id, {
+        method: 'DELETE'
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Eliminado:", data);
+        cargar();
+    })
+    .catch(err => console.error("Error al eliminar:", err));
+}
+
+// 🔽 Limpiar
+function limpiar() {
+    document.getElementById('descripcion').value = '';
+    document.getElementById('tipoEntidad').value = '';
+}
+
+// 🚀 INICIO
+cargar();
+
+</script>
