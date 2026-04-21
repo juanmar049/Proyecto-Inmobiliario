@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+  <h2>Propietario</h2>
+
+  <select id="idPersona"></select>
+  <input id="tipoPropiedad" placeholder="Tipo Propiedad">
+
+  <button onclick="crear()">Guardar</button>
+
+  <ul id="lista"></ul>
+</div>
+
+<script>
+function cargarPersonas() {
+  fetch('http://localhost:3000/persona')
+  .then(r => r.json())
+  .then(data => {
+    let select = document.getElementById('idPersona');
+    select.innerHTML = '<option value="">Seleccione Persona</option>';
+
+    data.forEach(p => {
+      if (p.tipo === "Propietario") {
+        select.innerHTML += `
+          <option value="${p.idPersona}">
+            ${p.nombre} ${p.apellido}
+          </option>`;
+      }
+    });
+  });
+}
+
+function cargar() {
+  fetch('http://localhost:3000/propietario')
+  .then(r => r.json())
+  .then(data => {
+    let lista = document.getElementById('lista');
+    lista.innerHTML = '';
+
+    data.forEach(p => {
+      lista.innerHTML += `
+        <li>
+          ${p.nombre} - ${p.tipoPropiedad}
+          <button onclick="eliminar(${p.idPropietario})">X</button>
+        </li>`;
+    });
+  });
+}
+
+function crear() {
+
+  let idPersona = document.getElementById('idPersona').value;
+  let tipoPropiedad = document.getElementById('tipoPropiedad').value;
+
+  if (!idPersona || !tipoPropiedad) {
+    alert("Complete todos los campos");
+    return;
+  }
+
+  fetch('http://localhost:3000/propietario', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      idPersona,
+      tipoPropiedad
+    })
+  })
+  .then(r => r.json())
+  .then(res => {
+    alert(res.mensaje || res.error);
+    cargar();
+  });
+}
+
+function eliminar(id){
+  fetch('http://localhost:3000/propietario/'+id,{method:'DELETE'})
+  .then(()=>cargar());
+}
+
+cargar();
+cargarPersonas();
+</script>
