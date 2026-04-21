@@ -1,0 +1,87 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+  <h2>Empleado</h2>
+
+  <select id="idPersona"></select>
+  <input id="cargo" placeholder="Cargo">
+  <input id="salario" placeholder="Salario">
+
+  <button onclick="crear()">Guardar</button>
+
+  <ul id="lista"></ul>
+</div>
+
+<script>
+function cargarPersonas() {
+  fetch('http://localhost:3000/persona')
+  .then(r => r.json())
+  .then(data => {
+    let select = document.getElementById('idPersona');
+    select.innerHTML = '<option value="">Seleccione Persona</option>';
+
+    data.forEach(p => {
+      if (p.tipo === "Empleado") {
+        select.innerHTML += `
+          <option value="${p.idPersona}">
+            ${p.nombre} ${p.apellido}
+          </option>`;
+      }
+    });
+  });
+}
+
+function cargar() {
+  fetch('http://localhost:3000/empleado')
+  .then(r => r.json())
+  .then(data => {
+    let lista = document.getElementById('lista');
+    lista.innerHTML = '';
+
+    data.forEach(e => {
+      lista.innerHTML += `
+        <li>
+          ${e.nombre} - ${e.cargo}
+          <button onclick="eliminar(${e.idEmpleado})">X</button>
+        </li>`;
+    });
+  });
+}
+
+
+function crear() {
+
+  let idPersona = document.getElementById('idPersona').value;
+  let cargo = document.getElementById('cargo').value;
+  let salario = document.getElementById('salario').value;
+
+  if (!idPersona || !cargo || !salario) {
+    alert("Complete todos los campos");
+    return;
+  }
+
+  fetch('http://localhost:3000/empleado', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      idPersona,
+      cargo,
+      salario
+    })
+  })
+  .then(r => r.json())
+  .then(res => {
+    alert(res.mensaje || res.error);
+    cargar();
+  });
+}
+
+
+function eliminar(id){
+  fetch('http://localhost:3000/empleado/'+id,{method:'DELETE'})
+  .then(()=>cargar());
+}
+
+cargar();
+cargarPersonas();
+</script>
