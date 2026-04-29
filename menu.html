@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú — Inmobiliaria</title>
+  <link rel="stylesheet" href="estilo.css">
+  <style>
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .menu-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      padding: 28px 24px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: var(--t);
+      cursor: pointer;
+    }
+
+    .menu-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,.10));
+      transform: translateY(-2px);
+    }
+
+    .menu-card .icono {
+      font-size: 36px;
+    }
+
+    .menu-card .titulo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .menu-card .desc {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .salir {
+      position: absolute;
+      right: 28px;
+      top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav" style="position:relative">
+  <a class="nav-brand" href="menu.html">🏢 Inmobiliaria</a>
+  <button class="btn btn-d btn-sm salir" onclick="salir()">⬅ Cerrar sesión</button>
+</nav>
+
+<div class="page">
+  <div class="ph">
+    <h1>Menú Principal</h1>
+    <p>Selecciona el módulo que deseas gestionar</p>
+  </div>
+
+  <div class="menu-grid">
+
+  <a class="menu-card" href="tipopersona.html">
+    <div class="icono">🏷️</div>
+    <div class="titulo">Tipo Persona</div>
+    <div class="desc">Administra las categorías de personas</div>
+  </a>
+
+  <a class="menu-card" href="persona.html">
+    <div class="icono">👥</div>
+    <div class="titulo">Persona</div>
+    <div class="desc">Gestión de personas</div>
+  </a>
+
+  <a class="menu-card" href="empleado.html">
+    <div class="icono">👔</div>
+    <div class="titulo">Empleado</div>
+    <div class="desc">Personal de la inmobiliaria</div>
+  </a>
+
+  <a class="menu-card" href="cliente.html">
+    <div class="icono">🤝</div>
+    <div class="titulo">Cliente</div>
+    <div class="desc">Gestión de clientes</div>
+  </a>
+
+  <a class="menu-card" href="propietario.html">
+    <div class="icono">🏘️</div>
+    <div class="titulo">Propietario</div>
+    <div class="desc">Propietarios registrados</div>
+  </a>
+
+  
+  <a class="menu-card" href="pais.html">
+    <div class="icono">🌎</div>
+    <div class="titulo">País</div>
+    <div class="desc">Gestión de países</div>
+  </a>
+
+  <a class="menu-card" href="departamento.html">
+    <div class="icono">🗺️</div>
+    <div class="titulo">Departamento</div>
+    <div class="desc">Gestión de departamentos</div>
+  </a>
+
+  <a class="menu-card" href="ciudad.html">
+    <div class="icono">🏙️</div>
+    <div class="titulo">Ciudad</div>
+    <div class="desc">Gestión de ciudades</div>
+  </a>
+
+</div>
+</div>
+
+<script>
+function salir() {
+  if (confirm('¿Cerrar sesión?')) window.location.href = 'login.html';
+}
+</script>
+</body>
+</html>
