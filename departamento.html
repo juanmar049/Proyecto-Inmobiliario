@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+  <h2>🏢 Departamento</h2>
+
+  <select id="idPais"></select>
+  <input id="nombre" placeholder="Nombre del departamento">
+
+<button onclick="crear()">Guardar</button>
+
+<ul id="lista"></ul>
+
+<script>
+let idEditar = null;
+
+function cargarPaises(){
+  fetch('http://localhost:3000/pais')
+  .then(r=>r.json())
+  .then(data=>{
+    let select = document.getElementById('idPais');
+    select.innerHTML = '<option value="">Seleccione País</option>';
+
+    data.forEach(p=>{
+      select.innerHTML += `<option value="${p.idPais}">${p.nombre}</option>`;
+    });
+  });
+}
+
+function cargar(){
+  fetch('http://localhost:3000/departamento')
+  .then(r=>r.json())
+  .then(data=>{
+    let lista = document.getElementById('lista');
+    lista.innerHTML='';
+
+    data.forEach(d=>{
+      lista.innerHTML += `
+        <li>
+          ${d.nombre} (País ${d.idPais})
+
+          <button onclick="editar(${d.idDepartamento}, '${d.nombre}', ${d.idPais})">✏️</button>
+          <button onclick="eliminar(${d.idDepartamento})">❌</button>
+        </li>
+      `;
+    });
+  });
+}
+
+function crear(){
+  let idPais = document.getElementById('idPais').value;
+  let nombre = document.getElementById('nombre').value;
+
+  if(idPais=='' || nombre.trim()==''){
+    alert("Complete todo");
+    return;
+  }
+
+  fetch('http://localhost:3000/departamento',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({idPais,nombre})
+  }).then(()=>{
+    document.getElementById('nombre').value='';
+    cargar();
+  });
+}
+
+function editar(id, nombreActual, idPais){
+  idEditar = id;
+
+  document.getElementById('nombre').value = nombreActual;
+  document.getElementById('idPais').value = idPais;
+}
+
+function eliminar(id){
+  fetch('http://localhost:3000/departamento/'+id,{method:'DELETE'})
+  .then(()=>cargar());
+}
+
+cargarPaises();
+cargar();
+</script>

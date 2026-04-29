@@ -1,0 +1,111 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+  <h2>🏙️ Ciudad</h2>
+
+  <select id="idPais"></select>
+<select id="idDepartamento"></select>
+<input id="nombre" placeholder="Nombre de la ciudad">
+
+<button onclick="crear()">Guardar</button>
+
+
+<ul id="lista"></ul>
+</div>
+
+<script>
+let idEditar = null;
+
+
+function cargarPaises(){
+  fetch('http://localhost:3000/pais')
+  .then(r=>r.json())
+  .then(data=>{
+    let select = document.getElementById('idPais');
+    select.innerHTML = '<option value="">Seleccione País</option>';
+
+    data.forEach(p=>{
+      select.innerHTML += `<option value="${p.idPais}">${p.nombre}</option>`;
+    });
+  });
+}
+
+
+function cargarDepartamentos(){
+  let idPais = document.getElementById('idPais').value;
+
+  fetch('http://localhost:3000/departamento')
+  .then(r=>r.json())
+  .then(data=>{
+    let select = document.getElementById('idDepartamento');
+    select.innerHTML = '<option value="">Seleccione Departamento</option>';
+
+    data.forEach(d=>{
+      if(d.idPais == idPais){
+        select.innerHTML += `<option value="${d.idDepartamento}">${d.nombre}</option>`;
+      }
+    });
+  });
+}
+
+
+function cargar(){
+  fetch('http://localhost:3000/ciudad')
+  .then(r=>r.json())
+  .then(data=>{
+    let lista = document.getElementById('lista');
+    lista.innerHTML='';
+
+    data.forEach(c=>{
+      lista.innerHTML += `
+        <li>
+          ${c.nombre} (Dep ${c.idDepartamento})
+
+          <button onclick="editar(${c.idCiudad}, '${c.nombre}', ${c.idDepartamento})">✏️</button>
+          <button onclick="eliminar(${c.idCiudad})">❌</button>
+        </li>
+      `;
+    });
+  });
+}
+
+
+function crear(){
+  let idDep = document.getElementById('idDepartamento').value;
+  let nombre = document.getElementById('nombre').value;
+
+  if(idDep=='' || nombre.trim()==''){
+    alert("Complete todo");
+    return;
+  }
+
+  fetch('http://localhost:3000/ciudad',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({idDepartamento:idDep,nombre})
+  }).then(()=>{
+    document.getElementById('nombre').value='';
+    cargar();
+  });
+}
+
+
+function editar(id, nombreActual, idDep){
+  idEditar = id;
+
+  document.getElementById('nombre').value = nombreActual;
+  document.getElementById('idDepartamento').value = idDep;
+}
+
+
+
+function eliminar(id){
+  fetch('http://localhost:3000/ciudad/'+id,{method:'DELETE'})
+  .then(()=>cargar());
+}
+
+document.getElementById('idPais').addEventListener('change', cargarDepartamentos);
+
+cargarPaises();
+cargar();
+</script>

@@ -1,0 +1,73 @@
+<link rel="stylesheet" href="estilo.css">
+
+<div class="container">
+  <h2>🌎 País</h2>
+
+  <input id="nombre" placeholder="Nombre del país">
+
+  <button onclick="crear()">Guardar</button>
+
+
+  <ul id="lista"></ul>
+</div>
+
+
+
+<script>
+let idEditar = null;
+
+function cargar(){
+  fetch('http://localhost:3000/pais')
+  .then(r=>r.json())
+  .then(data=>{
+    let lista = document.getElementById('lista');
+    lista.innerHTML='';
+
+    data.forEach(p=>{
+      lista.innerHTML += `
+        <li>
+          ${p.nombre}
+
+          <button onclick="editar(${p.idPais}, '${p.nombre}')">✏️</button>
+          <button onclick="eliminar(${p.idPais})">❌</button>
+        </li>
+      `;
+    });
+  });
+}
+
+function crear(){
+  let nombre = document.getElementById('nombre').value.trim();
+
+  if(nombre === ''){
+    alert("Escriba un nombre");
+    return;
+  }
+
+  fetch('http://localhost:3000/pais',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({nombre})
+  })
+  .then(()=>{
+    document.getElementById('nombre').value='';
+    cargar();
+  });
+}
+
+function editar(id, nombreActual){
+  idEditar = id;
+
+  document.getElementById('nombre').value = nombreActual;
+}
+
+function eliminar(id){
+  if(!confirm("¿Eliminar país?")) return;
+
+  fetch('http://localhost:3000/pais/'+id,{
+    method:'DELETE'
+  }).then(()=>cargar());
+}
+
+cargar();
+</script>
